@@ -109,6 +109,9 @@
 #undef SOFTFLOAT_ENABLED
 
 /* Define if subproject MCPPBS_SPROJ_NORM is enabled */
+#undef SPIKE_API_ENABLED
+
+/* Define if subproject MCPPBS_SPROJ_NORM is enabled */
 #undef SPIKE_DASM_ENABLED
 
 /* Define if subproject MCPPBS_SPROJ_NORM is enabled */

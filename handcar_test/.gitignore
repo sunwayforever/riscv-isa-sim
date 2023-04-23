@@ -1,0 +1,4 @@
+*.elf
+*.o
+handcar_test
+!test.elf

@@ -1,0 +1,13 @@
+spike_api_subproject_deps = \
+	fdt \
+	fesvr \
+	softfloat \
+	disasm \
+	riscv \
+
+spike_api_install_shared_lib = yes
+
+spike_api_srcs = \
+	spike_api.cc
+
+spike_api_CFLAGS = -fPIC
