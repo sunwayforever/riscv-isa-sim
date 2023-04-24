@@ -434,7 +434,7 @@ static void put_csr(int target, const char* regname, reg_t reg) {
     processor_t* p = g_sim->get_core(target);
     // NOTE: special case for mip
     if (strcmp(regname, "mip") == 0) {
-        p->get_state()->mip->backdoor_write_with_mask(1 << 3, reg);
+        p->get_state()->mip->backdoor_write_with_mask(((1 << 14) - 1), reg);
         return;
     }
 #define DECLARE_CSR(name, number) \
