@@ -427,15 +427,21 @@ static reg_t get_csr(int target, const char* regname) {
     if (strcmp(regname, #name) == 0) return p->get_csr(number);
 #include "encoding.h"  // generates if's for all csrs
 #undef DECLARE_CSR
-    return 0;
+    abort();
 }
 
 static void put_csr(int target, const char* regname, reg_t reg) {
     processor_t* p = g_sim->get_core(target);
+    // NOTE: special case for mip
+    if (strcmp(regname, "mip") == 0) {
+        p->get_state()->mip->backdoor_write_with_mask(1 << 3, reg);
+        return;
+    }
 #define DECLARE_CSR(name, number) \
     if (strcmp(regname, #name) == 0) return p->put_csr(number, reg);
 #include "encoding.h"  // generates if's for all csrs
 #undef DECLARE_CSR
+    abort();
 }
 
 extern "C" int read_simulator_register(
@@ -451,6 +457,7 @@ extern "C" int read_simulator_register(
         // freg
         int r =
             std::find(fpr_name, fpr_name + NFPR, std::string(name)) - fpr_name;
+        assert(r != NFPR);
         freg_t reg = p->get_state()->FPR[r];
         memcpy(buffer, &reg, len);
         return 0;
@@ -460,7 +467,7 @@ extern "C" int read_simulator_register(
     // gpr and csr
     unsigned long r =
         std::find(xpr_name, xpr_name + NXPR, std::string(name)) - xpr_name;
-    reg_t reg;
+    reg_t reg = 0;
     if (r == NXPR) {
         reg = get_csr(target, name);
     } else {
@@ -485,13 +492,14 @@ extern "C" int write_simulator_register(
         memcpy(&temp_fpr_val, buffer, len);
         int r =
             std::find(fpr_name, fpr_name + NFPR, std::string(name)) - fpr_name;
+        assert(r != NFPR);
         p->get_state()->FPR.write(r, temp_fpr_val);
         return 0;
     }
     // NOTE: does not support vreg
 
     // gpr and csr
-    reg_t reg;
+    reg_t reg = 0;
     memcpy(&reg, buffer, len);
 
     unsigned long r =
@@ -847,6 +855,7 @@ extern "C" int initialize_simulator(int argc, char** args) {
     }
 
     g_sim->set_debug(debug);
+    g_sim->set_procs_debug(debug);
     g_sim->configure_log(log, log_commits);
     g_sim->set_histogram(histogram);
     g_sim->start();
