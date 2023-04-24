@@ -17,7 +17,7 @@ void test_xpr() {
     for (int i = 0; i < 50; i++) {
         sim_api.step_simulator(0, 1, 0);
         uint64_t x;
-        sim_api.read_simulator_register(0, "tp", (uint8_t*)&x, 8);
+        sim_api.read_simulator_register(0, "tp", (uint8_t*)&x, sizeof(x));
         if (x == 0xa) {
             found = 1;
             break;
