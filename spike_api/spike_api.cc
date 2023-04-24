@@ -427,6 +427,7 @@ static reg_t get_csr(int target, const char* regname) {
     if (strcmp(regname, #name) == 0) return p->get_csr(number);
 #include "encoding.h"  // generates if's for all csrs
 #undef DECLARE_CSR
+    return 0;
 }
 
 static void put_csr(int target, const char* regname, reg_t reg) {
@@ -511,30 +512,32 @@ extern "C" int step_simulator(int target, int n, int fail) {
 }
 
 extern "C" int read_simulator_memory(
-    int target, uint64_t* addr, int size, uint8_t* buffer) {
+    int target, uint64_t* addr_ptr, int size, uint8_t* buffer) {
     processor_t* p = g_sim->get_core(target);
     mmu_t* mmu = p->get_mmu();
+    uint64_t addr = *addr_ptr;
     for (int i = 0; i < size; i++) {
-        buffer[i] = mmu->load<uint8_t>(*addr);
-        *addr += 1;
+        buffer[i] = mmu->load<uint8_t>(addr);
+        addr += 1;
     }
     return 0;
 }
 
 extern "C" int write_simulator_memory(
-    int target, uint64_t* addr, int size, uint8_t* buffer) {
+    int target, uint64_t* addr_ptr, int size, uint8_t* buffer) {
     processor_t* p = g_sim->get_core(target);
     mmu_t* mmu = p->get_mmu();
+    uint64_t addr = *addr_ptr;
     for (int i = 0; i < size; i++) {
-        mmu->store<uint8_t>(*addr, buffer[i]);
-        *addr += 1;
+        mmu->store<uint8_t>(addr, buffer[i]);
+        addr += 1;
     }
     return 0;
 }
 
 extern "C" int initialize_simulator(int argc, char** args) {
     char** argv = (char**)malloc(argc + 2);
-    argv[0] = "dummy";
+    argv[0] = (char*)"dummy";
     for (int i = 0; i < argc; i++) {
         argv[i + 1] = args[i];
     }

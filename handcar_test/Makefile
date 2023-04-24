@@ -1,20 +1,28 @@
-BIN := handcar_test
-all:${BIN}
-CXXFLAGS := -MMD -O0 -g3
-LDLIBS := -ldl -lstdc++
-LDFLAGS := -rdynamic
+all: payload test
 
-SRC := $(wildcard *.cc)
-OBJ := $(patsubst %.cc,%.o,${SRC})
-DEP := $(OBJ:.o=.d)
--include ${DEP}
+PAYLOAD_SRC := $(shell find ./ -name "test_*.s" -printf '%P\n')
+PAYLOAD_APP := $(patsubst %.s,%.elf,${PAYLOAD_SRC})
 
-${BIN}:${OBJ}
+${PAYLOAD_APP}:%.elf:%.s
+	riscv64-linux-gnu-gcc $< -o $@ -nostdlib -static -Wl,--script=test.ld
 
-run:${BIN}
-	./${BIN}
+payload:${PAYLOAD_APP}
+
+TEST_SRC := $(shell find ./ -name "test_*.c" -printf '%P\n')
+TEST_APP := $(patsubst %.c,%,${TEST_SRC})
+RUN_TEST_APP := $(patsubst %, run_%,${TEST_APP})
+
+${RUN_TEST_APP}:run_%:%.elf
+
+${TEST_APP}:%:%.c sim_loader.c
+	gcc $^ -o $@ -O0 -g3 -ldl -rdynamic
+
+test:${TEST_APP}
+
+run:${RUN_TEST_APP} 
+
+${RUN_TEST_APP}:run_%:%
+	./$<
 
 clean:
-	rm -f ${BIN} ${OBJ} ${DEP}
-
-.PHONY: run clean
+	rm -f ${TEST_APP} ${PAYLOAD_APP}
