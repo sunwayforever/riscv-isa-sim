@@ -27,9 +27,22 @@ void test_write_memory() {
     char* goodbye = "goodbye";
     sim_api.write_simulator_memory(0, &addr, strlen(goodbye) + 1, goodbye);
 
+    int found = 0;
+    /* NOTE: it is supposed to reach payload within 50 steps */
+    for (int i = 0; i < 50; i++) {
+        sim_api.step_simulator(0, 1, 0);
+        uint64_t x;
+        sim_api.read_simulator_register(0, "tp", (uint8_t*)&x, 8);
+        if (x == 0xa) {
+            found = 1;
+            break;
+        }
+    }
+    assert(found == 1);
+    sim_api.step_simulator(0, 1, 0);
     char y[13] = {0};
     sim_api.read_simulator_memory(0, &addr, strlen(goodbye) + 1, y);
-    assert(strcmp(y, goodbye) == 0);
+    assert(strcmp(y, "Goodbye") == 0);
     close_sim_api(&sim_api);
 }
 
