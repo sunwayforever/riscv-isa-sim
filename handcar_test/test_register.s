@@ -16,6 +16,8 @@ _start:
     addi  tp, zero, 0xa
     ld  a0, 0(t0)
     lw  a1, 0(t1)
+    # a1 changed to -1 outside
+    addi a1, a1, 1
 
     # test fpr
     addi  tp, zero, 0xb
