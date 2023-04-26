@@ -20,9 +20,13 @@ _start:
     addi a1, a1, 1
 
     # test fpr
+    # test double
     addi  tp, zero, 0xb
     fld  f0, 0(t2)
     fadd.d f0,f0,f0
+    # test nan and inf
+    fadd.s f0,f0,f2
+    # test flat
     flw  f1, 0(t3)
     fadd.s f2,f1,f2
 

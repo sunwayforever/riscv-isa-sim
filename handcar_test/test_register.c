@@ -63,6 +63,7 @@ void test_fpr() {
     }
     assert(found == 1);
     {
+        /* NOTE: read/write double */
         sim_api.step_simulator(0, 1, 0);
         double x = 0.0d;
         sim_api.read_simulator_register(0, "ft0", (uint8_t*)&x, sizeof(x));
@@ -71,9 +72,25 @@ void test_fpr() {
         sim_api.write_simulator_register(0, "ft0", (uint8_t*)&x, sizeof(x));
         sim_api.step_simulator(0, 1, 0);
         sim_api.read_simulator_register(0, "ft0", (uint8_t*)&x, sizeof(x));
-        assert(fabs(x - 6.0) < 1e-5);        
+        assert(fabs(x - 6.0) < 1e-5);
     }
     {
+        /* NOTE: read/write nan and inf */
+        float x = NAN;
+        sim_api.write_simulator_register(0, "ft0", (uint8_t*)&x, sizeof(x));
+        x = 0.0f;
+        sim_api.read_simulator_register(0, "ft0", (uint8_t*)&x, sizeof(x));
+        assert(isnan(x));
+
+        x = INFINITY;
+        sim_api.write_simulator_register(0, "ft0", (uint8_t*)&x, sizeof(x));
+        sim_api.step_simulator(0, 1, 0);
+        x = 0.0f;
+        sim_api.read_simulator_register(0, "ft0", (uint8_t*)&x, sizeof(x));
+        assert(x == INFINITY);
+    }
+    {
+        /* NOTE: read/write float */
         sim_api.step_simulator(0, 1, 0);
         float x = 0.0f;
         sim_api.read_simulator_register(0, "ft1", (uint8_t*)&x, sizeof(x));
