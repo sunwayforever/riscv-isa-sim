@@ -17,6 +17,7 @@
 #include "cachesim.h"
 #include "cfg.h"
 #include "config.h"
+#include "decode_macros.h"
 #include "disasm.h"
 #include "extension.h"
 #include "mmu.h"
@@ -427,7 +428,7 @@ static reg_t get_csr(int target, const char* regname) {
     if (strcmp(regname, #name) == 0) return p->get_csr(number);
 #include "encoding.h"  // generates if's for all csrs
 #undef DECLARE_CSR
-    abort();
+    assert(0);
 }
 
 static void put_csr(int target, const char* regname, reg_t reg) {
@@ -441,7 +442,7 @@ static void put_csr(int target, const char* regname, reg_t reg) {
     if (strcmp(regname, #name) == 0) return p->put_csr(number, reg);
 #include "encoding.h"  // generates if's for all csrs
 #undef DECLARE_CSR
-    abort();
+    assert(0);
 }
 
 extern "C" int read_simulator_register(
@@ -459,7 +460,29 @@ extern "C" int read_simulator_register(
             std::find(fpr_name, fpr_name + NFPR, std::string(name)) - fpr_name;
         assert(r != NFPR);
         freg_t reg = p->get_state()->FPR[r];
-        memcpy(buffer, &reg, len);
+        union {
+            float16_t f16;
+            float32_t f32;
+            float64_t f64;
+            float128_t f128;
+        } d;
+        switch (len) {
+            case 2:
+                d.f16 = f16(reg);
+                break;
+            case 4:
+                d.f32 = f32(reg);
+                break;
+            case 8:
+                d.f64 = f64(reg);
+                break;
+            case 16:
+                d.f128 = f128(reg);
+                break;
+            default:
+                assert(0);
+        }
+        memcpy(buffer, &d, len);
         return 0;
     }
     // NOTE: does not support vreg
@@ -486,14 +509,27 @@ extern "C" int write_simulator_register(
     }
     if (name[0] == 'f') {
         // freg
-        freg_t temp_fpr_val;
-        temp_fpr_val.v[0] = 0xffffffffffffffffull;
-        temp_fpr_val.v[1] = 0xffffffffffffffffull;
-        memcpy(&temp_fpr_val, buffer, len);
+        freg_t fpr_val;
+        switch (len) {
+            case 2:
+                fpr_val = freg(*((float16_t*)buffer));
+                break;
+            case 4:
+                fpr_val = freg(*((float32_t*)buffer));
+                break;
+            case 8:
+                fpr_val = freg(*((float64_t*)buffer));
+                break;
+            case 16:
+                fpr_val = freg(*((float128_t*)buffer));
+                break;
+            default:
+                assert(0);
+        }
         int r =
             std::find(fpr_name, fpr_name + NFPR, std::string(name)) - fpr_name;
         assert(r != NFPR);
-        p->get_state()->FPR.write(r, temp_fpr_val);
+        p->get_state()->FPR.write(r, fpr_val);
         return 0;
     }
     // NOTE: does not support vreg

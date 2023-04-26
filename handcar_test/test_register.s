@@ -22,6 +22,7 @@ _start:
     # test fpr
     addi  tp, zero, 0xb
     fld  f0, 0(t2)
+    fadd.d f0,f0,f0
     flw  f1, 0(t3)
     fadd.s f2,f1,f2
 
