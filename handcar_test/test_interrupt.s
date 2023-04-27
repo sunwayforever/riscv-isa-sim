@@ -9,8 +9,6 @@ interrupt_vector_table:
     .word   _start                  # 0x04: non-maskable interrupt (machine check)
     .word   _start                  # 0x08: non-maskable interrupt (external interrupt)
     jal   handle_soft_interrupt     # 0x0c: non-maskable interrupt (software interrupt)
-    #leif
-
 
 _start:
     # set mtvec as vector mode interrupt
@@ -33,8 +31,6 @@ _start:
     li t0, 0
 
 .align 4
-
-
 handle_soft_interrupt:
     # handle software interrupt
     addi tp, zero, 0xe
@@ -45,12 +41,5 @@ handle_soft_interrupt:
 
 
     .data
-float1: .double 2.0
-float2: .float 1.0
-float3: .float 1.0
-    .align 16
-data1: .dword 0x12345678
-data2: .word 0x1234
-
 tohost: .dword 1
 fromhost: .dword 1
