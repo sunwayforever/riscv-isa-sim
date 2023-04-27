@@ -1,43 +1,9 @@
-
     .global _start, tohost, fromhost
-
-    #leif
-    .section .text.init
-    .align 2
-    .type interrupt_vector_table, @object
-interrupt_vector_table:
-    .word   0                       # 0x00: reset
-    .word   _start                  # 0x04: non-maskable interrupt (machine check)
-    .word   _start                  # 0x08: non-maskable interrupt (external interrupt)
-    .word   handle_soft_interrupt   # 0x0c: non-maskable interrupt (software interrupt)
-    .word   _start                  # 0x10: non-maskable interrupt (timer interrupt)
-    .word   _start                  # 0x14: non-maskable interrupt (external interrupt)
-    .word   _start                  # 0x18: non-maskable interrupt (timer interrupt)
-    .word   _start                  # 0x1c: non-maskable interrupt (external interrupt)
-    .word   _start                  # 0x20: non-maskable interrupt (local interrupt)
-    .word   _start                  # 0x24: non-maskable interrupt (local interrupt)
-    .word   _start                  # 0x28: non-maskable interrupt (local interrupt)
-    .word   _start                  # 0x2c: non-maskable interrupt (local interrupt)
-    .word   _start                  # 0x30: non-maskable interrupt (local interrupt)
-    .word   _start                  # 0x34: non-maskable interrupt (local interrupt)
-    .word   _start                  # 0x38: non-maskable interrupt (local interrupt)
-    .word   _start                  # 0x3c: non-maskable interrupt (local interrupt)
-
-    .section .text
-    .align 2
-    .global _start, tohost, fromhost
-    #leif
 
 _start:
     # NOTE: set sstatus_fs to enable FPU
     li t0, 0x00006000
     csrs sstatus, t0
-
-    #leif
-    # Set mtvec to the address of the interrupt vector table
-    la t0, interrupt_vector_table
-    csrw mtvec, t0
-    #leif
 
     la t0,data1
     la t1,data2
@@ -70,21 +36,8 @@ _start:
     csrs mie, t0
     csrs mstatus,t0
 
-    #leif
-    la t0,handle_soft_interrupt
-    #leif
-
     addi  tp, zero, 0xc
     li t0, 0
-
-.align 4
-handle_soft_interrupt:
-    # handle software interrupt
-    addi tp, zero, 0xd
-    # clear software interrupt flag
-    li t0, 1<<3
-    csrs mstatus, t0
-    ret
 
     .data
 float1: .double 2.0
