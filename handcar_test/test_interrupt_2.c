@@ -37,10 +37,10 @@ void test_interrupt_2() {
 
         sim_api.read_simulator_register(0, "mtvec", (uint8_t*)&y, sizeof(y));
         //printf("before mtvec value is: %" PRIu64 "\n", y);
-        
+
          /*To triger the software interrupt*/
         sim_api.write_simulator_register(0, "mip", (uint8_t*)&x, sizeof(x));
-        
+
         sim_api.read_simulator_register(0, "mip", (uint8_t*)&y, sizeof(y));
         //printf("after mip value is: %" PRIu64 "\n", y);
 
@@ -49,7 +49,6 @@ void test_interrupt_2() {
 
         sim_api.read_simulator_register(0, "mtvec", (uint8_t*)&y, sizeof(y));
         //printf("direct mode mtvec value is: %" PRIu64 "\n", y);
-
     }
     /*Step and start handle the software interrupt*/
     sim_api.step_simulator(0, 1, 0);

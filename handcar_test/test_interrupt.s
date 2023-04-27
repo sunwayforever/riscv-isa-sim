@@ -47,7 +47,7 @@ handle_soft_interrupt:
     .data
 float1: .double 2.0
 float2: .float 1.0
-float3: .float 1.0    
+float3: .float 1.0
     .align 16
 data1: .dword 0x12345678
 data2: .word 0x1234
