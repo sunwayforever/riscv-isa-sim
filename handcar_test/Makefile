@@ -4,7 +4,7 @@ PAYLOAD_SRC := $(shell find ./ -name "test_*.s" -printf '%P\n')
 PAYLOAD_APP := $(patsubst %.s,%.elf,${PAYLOAD_SRC})
 
 ${PAYLOAD_APP}:%.elf:%.s
-	/opt/riscv64_gnu_toolchain/bin/riscv64-linux-gnu-gcc $< -o $@ -nostdlib -static -Wl,--script=test.ld
+	riscv64-linux-gnu-gcc $< -o $@ -nostdlib -static -Wl,--script=test.ld
 
 payload:${PAYLOAD_APP}
 
