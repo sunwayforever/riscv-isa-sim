@@ -454,7 +454,15 @@ extern "C" int read_simulator_register(
         memcpy(buffer, &value, len);
         return 0;
     }
-    if (name[0] == 'f') {
+    const char* fpr_csr[] = {"fcsr", "frm", "fflags"};
+    int r_f = std::find(fpr_csr, fpr_csr + 3, std::string(name)) - fpr_csr;
+    int b_f_csr = 0;
+    if (r_f != 3)
+        {
+            b_f_csr = 1;
+        }
+    //printf("b_f_csr: %d\n",b_f_csr);
+    if (name[0] == 'f' && (!b_f_csr)) {
         // freg
         int r =
             std::find(fpr_name, fpr_name + NFPR, std::string(name)) - fpr_name;
@@ -507,7 +515,15 @@ extern "C" int write_simulator_register(
         memcpy(&(p->get_state()->pc), buffer, len);
         return 0;
     }
-    if (name[0] == 'f') {
+    const char* fpr_csr[] = {"fcsr", "frm", "fflags"};
+    int r_f = std::find(fpr_csr, fpr_csr + 3, std::string(name)) - fpr_csr;
+    int b_f_csr = 0;
+    if (r_f != 3)
+        {
+            b_f_csr = 1;
+        }
+    //printf("b_f_csr: %d\n",b_f_csr);
+    if (name[0] == 'f' && (!b_f_csr)) {
         // freg
         freg_t fpr_val;
         switch (len) {
