@@ -19,16 +19,16 @@ _start:
 
     # test csr
     addi  tp, zero, 0xc
-    #fmadd.s rd, rs1, rs2, rs3, rm
-    #fmadd.s f3,f2,f3,f4,dyn
+    # first cal f2*f3+f4
     fmadd.s f5,f2,f3,f4,dyn
+    # second cal f2*f3+f4
     fmadd.s f6,f2,f3,f4,dyn
     li t0, 0
 
     .data
-float2: .float 2.4
-float3: .float 3.3
-float4: .float 1.5
+float2: .float 1.0
+float3: .float 1.0000003
+float4: .float 0.0000002
 float5: .float 1.0
 float6: .float 1.0  
 

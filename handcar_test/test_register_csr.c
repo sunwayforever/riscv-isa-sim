@@ -69,35 +69,36 @@ void test_csr() {
         float x5;
         float x6;
     {
-        //float x2;
         sim_api.read_simulator_register(0, fpr_name[2], (uint8_t*)&x2, sizeof(x2));
         //printf("f2 ori:%f \n", x2);
     }
     {
-        //float x3;
         sim_api.read_simulator_register(0, fpr_name[3], (uint8_t*)&x3, sizeof(x3));
         //printf("f3 ori:%f \n", x3);
     }
     {
-        //float x4;
         sim_api.read_simulator_register(0, fpr_name[4], (uint8_t*)&x4, sizeof(x4));
         //printf("f4 ori:%f \n", x4);
     }
     // printf("result is : %f\n", x2*x3 + x4);
     sim_api.step_simulator(0, 1, 0);
     {
-        //float x5;
         sim_api.read_simulator_register(0, fpr_name[5], (uint8_t*)&x5, sizeof(x5));
         //printf("f5 after:%f \n", x5);
     }
     assert(fabs(x5 - (float)(x2*x3 + x4)) < 1e-5);
     {
-        uint32_t x = 0x3;
+        // FRM values list
+        // 000: RNE Round to Nearest, ties to Even
+        // 001: RTZ Round towards Zero
+        // 010: RDN Round Down
+        // 011: RUP Round Up
+        // 100: RMM Round to Nearest, ties to Magnitude
+        uint32_t x = 0x1;
         sim_api.write_simulator_register(0, "frm", (uint8_t*)&x, sizeof(x));
     }
     sim_api.step_simulator(0, 1, 0);
     {
-        //float x6;
         sim_api.read_simulator_register(0, fpr_name[6], (uint8_t*)&x6, sizeof(x6));
         //printf("f6 after:%f \n", x6);
     }
