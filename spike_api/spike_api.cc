@@ -454,12 +454,10 @@ extern "C" int read_simulator_register(
         memcpy(buffer, &value, len);
         return 0;
     }
-    if (name[0] == 'f') {
+    int r_f = std::find(fpr_name, fpr_name + NFPR, std::string(name)) - fpr_name;
+    if (r_f != NFPR) {
         // freg
-        int r =
-            std::find(fpr_name, fpr_name + NFPR, std::string(name)) - fpr_name;
-        assert(r != NFPR);
-        freg_t reg = p->get_state()->FPR[r];
+        freg_t reg = p->get_state()->FPR[r_f];
         union {
             float16_t f16;
             float32_t f32;
@@ -507,7 +505,9 @@ extern "C" int write_simulator_register(
         memcpy(&(p->get_state()->pc), buffer, len);
         return 0;
     }
-    if (name[0] == 'f') {
+
+    int r_f = std::find(fpr_name, fpr_name + NFPR, std::string(name)) - fpr_name;
+    if (r_f != NFPR) {
         // freg
         freg_t fpr_val;
         switch (len) {
@@ -526,10 +526,7 @@ extern "C" int write_simulator_register(
             default:
                 assert(0);
         }
-        int r =
-            std::find(fpr_name, fpr_name + NFPR, std::string(name)) - fpr_name;
-        assert(r != NFPR);
-        p->get_state()->FPR.write(r, fpr_val);
+        p->get_state()->FPR.write(r_f, fpr_val);
         return 0;
     }
     // NOTE: does not support vreg
