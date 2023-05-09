@@ -582,7 +582,7 @@ extern "C" int initialize_simulator(int argc, char** args) {
     for (int i = 0; i < argc; i++) {
         argv[i + 1] = args[i];
     }
-    argv[argc + 2] = (char*)NULL;
+    argv[argc + 1] = (char*)NULL;
     argc = argc + 1;
 
     bool debug = false;
